@@ -1307,6 +1307,7 @@ def new_ice_water_content(
     q_t2: npt.NDArray[np.float64],
     q_sat_t1: npt.NDArray[np.float64],
     q_sat_t2: npt.NDArray[np.float64],
+    q_sat_t2_sed: npt.NDArray[np.float64],
     mass_plume_t1: npt.NDArray[np.float64],
     mass_plume_t2: npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
@@ -1354,9 +1355,9 @@ def new_ice_water_content(
     (5) ``iwc_t2 = mass_h2o_t2 / mass_plume_t2 - q_sat_t2``: H2O in the
         gas phase is removed (``- q_sat_t2``).
     """
-    q_mean = 0.5 * (q_t1 + q_t2)
+    q_mean = 0.5 * (q_t1 + q_t2 - (q_sat_t1 + q_sat_t2_sed))
     mass_h2o_t1 = mass_plume_t1 * (iwc_t1 + q_sat_t1)
-    mass_h2o_t2 = mass_h2o_t1 + (mass_plume_t2 - mass_plume_t1) * q_mean
+    mass_h2o_t2 = mass_h2o_t1 + (mass_plume_t2 - mass_plume_t1) * q_mean + (mass_plume_t2 * q_sat_t2_sed - mass_plume_t1 * q_sat_t1)
     iwc_t2 = (mass_h2o_t2 / mass_plume_t2) - q_sat_t2
     iwc_t2.clip(min=0.0, out=iwc_t2)
     return iwc_t2
