@@ -63,7 +63,7 @@ class CocipParams(ModelParams):
 
     #: Apply Euler's method with a fixed step size of ``dt_integration``. Advected waypoints
     #: are interpolated against met data once each ``dt_integration``.
-    dt_integration: np.timedelta64 = np.timedelta64(30, "m")
+    dt_integration: np.timedelta64 = np.timedelta64(5, "m")
 
     #: Difference in altitude between top and bottom layer for stratification calculations,
     #: [:math:`m`]. Used to approximate derivative of "lagrangian_tendency_of_air_pressure" layer.
@@ -255,7 +255,7 @@ class CocipParams(ModelParams):
     max_seg_length_m: float = 40000.0
 
     #: Max age of contrail evolution.
-    max_age: np.timedelta64 = np.timedelta64(20, "h")
+    max_age: np.timedelta64 = np.timedelta64(24, "h")
 
     #: Minimum contrail optical depth.
     min_tau: float = 1e-6
