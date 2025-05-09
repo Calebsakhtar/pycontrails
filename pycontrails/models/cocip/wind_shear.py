@@ -115,7 +115,7 @@ def wind_shear_normal(
     min_shear = np.min(dsn_dz)
 
     if chosen_shear != 2e-3 or nan_present:
-        print("Shear : " + str(min_shear))
+        print("NORMAL shear: " + str(min_shear))
 
     return dsn_dz
 
@@ -155,7 +155,7 @@ def wind_shear(
 
     ds_dz = (du_dz**2 + dv_dz**2) ** 0.5
 
-    # Set shear to the closest value 
+    # Set shear to the closest value
     shear_max = np.max(ds_dz)
 
     shear_options = [2e-3, 6e-3]
