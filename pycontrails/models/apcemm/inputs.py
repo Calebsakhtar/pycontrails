@@ -114,7 +114,7 @@ class APCEMMInput:
     n_threads: int = 1
 
     #: Maximum APCEMM simulation time
-    max_age: np.timedelta64 = np.timedelta64(20, "h")
+    max_age: np.timedelta64 = np.timedelta64(24, "h")
 
     #: Output directory name (relative to APCEMM simulation directory)
     output_directory: pathlib.Path | str = "out"

@@ -47,7 +47,7 @@ class APCEMMParams(models.ModelParams):
     """Default parameters for the pycontrails :class:`APCEMM` interface."""
 
     #: Maximum contrail age
-    max_age: np.timedelta64 = np.timedelta64(20, "h")
+    max_age: np.timedelta64 = np.timedelta64(24, "h")
 
     #: Longitude buffer for Lagrangian trajectory calculation [WGS84]
     met_longitude_buffer: tuple[float, float] = (10.0, 10.0)

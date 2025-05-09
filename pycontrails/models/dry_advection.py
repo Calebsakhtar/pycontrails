@@ -35,10 +35,10 @@ class DryAdvectionParams(models.AdvectionBuffers):
 
     #: Apply Euler's method with a fixed step size of ``dt_integration``. Advected waypoints
     #: are interpolated against met data once each ``dt_integration``.
-    dt_integration: np.timedelta64 = np.timedelta64(30, "m")
+    dt_integration: np.timedelta64 = np.timedelta64(5, "m")
 
     #: Max age of plume evolution.
-    max_age: np.timedelta64 = np.timedelta64(20, "h")
+    max_age: np.timedelta64 = np.timedelta64(24, "h")
 
     #: Rate of change of pressure due to sedimentation [:math:`Pa/s`]
     sedimentation_rate: float = 0.0
