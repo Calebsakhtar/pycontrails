@@ -873,7 +873,7 @@ class Cocip(Model):
 
         # wind shear
         ds_dz = self._sac_flight["ds_dz"] = wind_shear.wind_shear(
-            u_wind, u_wind_lower, v_wind, v_wind_lower, dz_m
+            u_wind, u_wind_lower, v_wind, v_wind_lower, dz_m, wind_shear=self.params["normal_shear"]
         )
 
         # Initial contrail width, depth and downward displacement
@@ -888,6 +888,17 @@ class Cocip(Model):
             effective_vertical_resolution=self.params["effective_vertical_resolution"],
             wind_shear_enhancement_exponent=self.params["wind_shear_enhancement_exponent"],
         )
+
+        if self.params["circulation"] and self.params["unterstrasser_ice_survival_fraction"]:
+            dz_max = self._sac_flight["dz_max"] = unterstrasser_wake_vortex.z_desc_length_scale(
+                wingspan=wingspan,
+                air_temperature=air_temperature,
+                air_pressure=air_pressure,
+                true_airspeed=true_airspeed,
+                aircraft_mass=aircraft_mass,
+                dT_dz=dT_dz,
+                circulation=self.params["circulation"],
+            )
 
         # derive downwash values and save to data model
         self._sac_flight["width"] = wake_vortex.initial_contrail_width(wingspan, dz_max)
@@ -976,6 +987,11 @@ class Cocip(Model):
         iwc = contrail_properties.initial_iwc(
             air_temperature, specific_humidity, air_pressure, fuel_dist, width, depth, ei_h2o
         )
+
+        if self.params["I_formation"]:
+            rho_air_formation = thermo.rho_d(air_temperature, air_pressure)
+            iwc = self.params["I_formation"] / (width * depth * rho_air_formation)
+
         iwc_ad = contrail_properties.iwc_adiabatic_heating(
             air_temperature, air_pressure, air_pressure_1
         )
@@ -997,6 +1013,9 @@ class Cocip(Model):
         else:
             f_surv = contrail_properties.ice_particle_survival_fraction(iwc, iwc_1)
 
+        if self.params["f_surv"]:
+            f_surv = self.params["f_surv"]
+
         n_ice_per_m_0 = contrail_properties.initial_ice_particle_number(
             nvpm_ei_n=nvpm_ei_n,
             fuel_dist=fuel_dist,
@@ -1004,6 +1023,10 @@ class Cocip(Model):
             T_crit_sac=T_critical_sac,
             min_ice_particle_number_nvpm_ei_n=self.params["min_ice_particle_number_nvpm_ei_n"],
         )
+
+        if self.params["N_formation"]:
+            n_ice_per_m_0 = self.params["N_formation"]
+
         n_ice_per_m_1 = n_ice_per_m_0 * f_surv
 
         # Check for persistent initial_contrails
@@ -1935,7 +1958,14 @@ def calc_timestep_meteorology(
     )
 
     # wind shear
-    ds_dz = wind_shear.wind_shear(u_wind, u_wind_lower, v_wind, v_wind_lower, params["dz_m"])
+    ds_dz = wind_shear.wind_shear(
+        u_wind,
+        u_wind_lower,
+        v_wind,
+        v_wind_lower,
+        params["dz_m"],
+        wind_shear=params["normal_shear"],
+    )
 
     # wind shear normal
     dsn_dz = wind_shear.wind_shear_normal(
@@ -1946,6 +1976,7 @@ def calc_timestep_meteorology(
         cos_a=cos_a,
         sin_a=sin_a,
         dz=params["dz_m"],
+        wind_shear=params["normal_shear"],
     )
 
     # store values on contrail model

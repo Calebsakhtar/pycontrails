@@ -383,6 +383,7 @@ def z_desc_length_scale(
     true_airspeed: npt.NDArray[np.floating],
     aircraft_mass: npt.NDArray[np.floating],
     dT_dz: npt.NDArray[np.floating],
+    circulation: float | None = None,
 ) -> npt.NDArray[np.floating]:
     """Calculate the final vertical displacement of the wake vortex.
 
@@ -413,6 +414,11 @@ def z_desc_length_scale(
     gamma_0 = _initial_wake_vortex_circulation(
         wingspan, air_temperature, air_pressure, true_airspeed, aircraft_mass
     )
+
+    # Override the circulation if provided in cocip.params
+    if circulation:
+        gamma_0 = circulation * np.ones_like(gamma_0)
+
     n_bv = thermo.brunt_vaisala_frequency(air_pressure, air_temperature, dT_dz)
     return ((8.0 * gamma_0) / (np.pi * n_bv)) ** 0.5
 

@@ -55,6 +55,7 @@ def wind_shear_normal(
     cos_a: ArrayScalarLike,
     sin_a: ArrayScalarLike,
     dz: float,
+    wind_shear: float | None = None,
 ) -> ArrayScalarLike:
     r"""Calculate the total wind shear normal to an axis.
 
@@ -82,42 +83,14 @@ def wind_shear_normal(
     ArrayScalarLike
        Wind shear normal to axis, [:math:`s^{-1}`]
     """
+    # If already provided, use the given wind shear value
+    if wind_shear:
+        return wind_shear * np.ones_like(u_wind_top)
+
     du_dz = (u_wind_top - u_wind_btm) / dz
     dv_dz = (v_wind_top - v_wind_btm) / dz
-    # return dv_dz * cos_a - du_dz * sin_a
 
-    dsn_dz = dv_dz * cos_a - du_dz * sin_a
-    ds_dz = (du_dz**2 + dv_dz**2) ** 0.5
-
-    # Set shear to the closest value
-    shear_max = np.max(ds_dz)
-
-    shear_options = [2e-3, 6e-3]
-    shear_distance = []
-
-    for shear in shear_options:
-        shear_distance.append(np.abs(shear - shear_max))
-
-    shear_options = np.array(shear_options)
-    shear_distance = np.array(shear_distance)
-
-    index_min = np.argmin(shear_distance)
-    chosen_shear = shear_options[index_min]
-    if np.isnan(dsn_dz).any():
-        chosen_shear = 2e-3
-        nan_present = True
-        print("Removed NaN!")
-    else:
-        nan_present = False
-
-    mask = np.full(dsn_dz.shape, True)
-    dsn_dz = np.where(mask, -chosen_shear, dsn_dz)
-    min_shear = np.min(dsn_dz)
-
-    if chosen_shear != 2e-3 or nan_present:
-        print("NORMAL shear: " + str(min_shear))
-
-    return dsn_dz
+    return dv_dz * cos_a - du_dz * sin_a
 
 
 def wind_shear(
@@ -126,6 +99,7 @@ def wind_shear(
     v_wind_top: ArrayScalarLike,
     v_wind_btm: ArrayScalarLike,
     dz: float,
+    wind_shear: float | None = None,
 ) -> ArrayScalarLike:
     r"""Calculate the total wind shear.
 
@@ -149,38 +123,10 @@ def wind_shear(
     ArrayScalarLike
        Total wind shear, [:math:`s^{-1}`]
     """
+    # If already provided, use the given wind shear value
+    if wind_shear:
+        return np.abs(wind_shear) * np.ones_like(u_wind_top)
+
     du_dz = (u_wind_top - u_wind_btm) / dz
     dv_dz = (v_wind_top - v_wind_btm) / dz
-    # return (du_dz**2 + dv_dz**2) ** 0.5
-
-    ds_dz = (du_dz**2 + dv_dz**2) ** 0.5
-
-    # Set shear to the closest value
-    shear_max = np.max(ds_dz)
-
-    shear_options = [2e-3, 6e-3]
-    shear_distance = []
-
-    for shear in shear_options:
-        shear_distance.append(np.abs(shear - shear_max))
-
-    shear_options = np.array(shear_options)
-    shear_distance = np.array(shear_distance)
-
-    index_min = np.argmin(shear_distance)
-    chosen_shear = shear_options[index_min]
-    if np.isnan(ds_dz).any():
-        chosen_shear = 2e-3
-        nan_present = True
-        # print("Removed NaN!")
-    else:
-        nan_present = False
-
-    mask = np.full(ds_dz.shape, True)
-    ds_dz = np.where(mask, chosen_shear, ds_dz)
-    min_shear = np.min(ds_dz)
-
-    if chosen_shear != 2e-3 or nan_present:
-        print("Shear : " + str(min_shear))
-
-    return ds_dz
+    return (du_dz**2 + dv_dz**2) ** 0.5
