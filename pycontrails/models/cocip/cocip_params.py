@@ -54,6 +54,15 @@ class CocipParams(AdvectionBuffers):
     """Model parameters required by the CoCiP models."""
 
     # -------------------------
+    # Parameters for the EULAG/APCEMM comparison
+    # -------------------------
+    normal_shear: float | None = None  # [1/s]
+    N_formation: float | None = None  # [#/m]
+    I_formation: float | None = None  # [kg/m]
+    circulation: float | None = None  # [m^2/s]
+    f_surv: float | None = None  # [1]
+
+    # -------------------------
     # Implementation parameters
     # -------------------------
 
@@ -212,7 +221,7 @@ class CocipParams(AdvectionBuffers):
     #:
     #:  .. versionadded:: 0.50.1
     #:  .. versionchanged:: 0.54.7
-    unterstrasser_ice_survival_fraction: bool = False
+    unterstrasser_ice_survival_fraction: bool = True
 
     #: Experimental. Radiative heating effects on contrail cirrus properties.
     #: Terrestrial and solar radiances warm the contrail ice particles and cause
@@ -266,11 +275,11 @@ class CocipParams(AdvectionBuffers):
 
     #: Minimum altitude domain in simulation, [:math:`m`]
     #: If set to ``None``, this check is disabled.
-    min_altitude_m: float | None = 6000.0
+    min_altitude_m: float | None = 9000.0
 
     #: Maximum altitude domain in simulation, [:math:`m`]
     #: If set to ``None``, this check is disabled.
-    max_altitude_m: float | None = 13000.0
+    max_altitude_m: float | None = 11500.0
 
     #: Maximum contrail segment length in simulation to prevent unrealistic values, [:math:`m`].
     max_seg_length_m: float = 40000.0
