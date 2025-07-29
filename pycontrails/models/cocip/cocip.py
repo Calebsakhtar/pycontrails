@@ -987,7 +987,9 @@ class Cocip(Model):
         iwc = contrail_properties.initial_iwc(
             air_temperature, specific_humidity, air_pressure, fuel_dist, width, depth, ei_h2o
         )
+        print("Initial IWC: ", iwc, " kg_ice/kg_air")
 
+        # Optional hijacking of ice mass emitted from the aircraft
         if self.params["I_formation"]:
             rho_air_formation = thermo.rho_d(air_temperature, air_pressure)
             iwc = self.params["I_formation"] / (width * depth * rho_air_formation)
@@ -1010,9 +1012,11 @@ class Cocip(Model):
                 nvpm_ei_n,
                 0.5 * depth,  # Taking the mid-point of the contrail plume
             )
+            print("Initial ice particle survival fraction: ", f_surv)
         else:
             f_surv = contrail_properties.ice_particle_survival_fraction(iwc, iwc_1)
 
+        # Optional hijacking of the survival fraction
         if self.params["f_surv"]:
             f_surv = self.params["f_surv"]
 
@@ -1023,7 +1027,9 @@ class Cocip(Model):
             T_crit_sac=T_critical_sac,
             min_ice_particle_number_nvpm_ei_n=self.params["min_ice_particle_number_nvpm_ei_n"],
         )
+        print("Initial ice number count: ", n_ice_per_m_0, " m^-1")
 
+        # Optional hijacking of the initial ice particle number
         if self.params["N_formation"]:
             n_ice_per_m_0 = self.params["N_formation"]
 
