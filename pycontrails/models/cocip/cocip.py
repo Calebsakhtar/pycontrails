@@ -987,6 +987,14 @@ class Cocip(Model):
         iwc = contrail_properties.initial_iwc(
             air_temperature, specific_humidity, air_pressure, fuel_dist, width, depth, ei_h2o
         )
+        print("Air temperature: ", air_temperature, " K")
+        print("Specific humidity: ", specific_humidity, " kg_water/kg_air")
+        print("Air pressure: ", air_pressure, " Pa")
+        print("Fuel flow: ", fuel_flow, " kg/s")
+        print("Fuel dist: ", fuel_dist, " kg/m")
+        print("Width: ", width, " m")
+        print("Depth: ", depth, " m")
+        print("Ice emission index: ", ei_h2o, " kg_ice/kg_fuel")
         print("Initial IWC: ", iwc, " kg_ice/kg_air")
 
         # Optional hijacking of ice mass emitted from the aircraft
@@ -1002,6 +1010,7 @@ class Cocip(Model):
         if self.params["unterstrasser_ice_survival_fraction"]:
             wingspan = self._sac_flight.get_data_or_attr("wingspan")
             rhi_0 = thermo.rhi(specific_humidity, air_temperature, air_pressure)
+            print("RHI before wake vortex: ", rhi_0 * 100, " %")
             f_surv = unterstrasser_wake_vortex.ice_particle_number_survival_fraction(
                 air_temperature,
                 rhi_0,
@@ -1010,7 +1019,7 @@ class Cocip(Model):
                 true_airspeed,
                 fuel_flow,
                 nvpm_ei_n,
-                0.5 * depth,  # Taking the mid-point of the contrail plume
+                self._sac_flight["dz_max"],
             )
             print("Initial ice particle survival fraction: ", f_surv)
         else:
