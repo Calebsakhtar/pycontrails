@@ -38,7 +38,7 @@ class DryAdvectionParams(models.AdvectionBuffers):
     dt_integration: np.timedelta64 = np.timedelta64(5, "m")
 
     #: Max age of plume evolution.
-    max_age: np.timedelta64 = np.timedelta64(24, "h")
+    max_age: np.timedelta64 = np.timedelta64(8, "h")
 
     #: Rate of change of pressure due to sedimentation [:math:`Pa/s`]
     sedimentation_rate: float = 0.0
