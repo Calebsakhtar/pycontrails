@@ -61,6 +61,11 @@ class CocipParams(AdvectionBuffers):
     I_formation: float | None = None  # [kg/m]
     circulation: float | None = None  # [m^2/s]
     f_surv: float | None = None  # [1]
+    width_postvortex: float | None = None  # [m]
+    depth_postvortex: float | None = None  # [m]
+    contrail_initzcoord: float | None = None  # [m]
+    I_postvortex: float | None = None  # [kg/m]
+    N_postvortex: float | None = None  # [#/m]
 
     # -------------------------
     # Implementation parameters

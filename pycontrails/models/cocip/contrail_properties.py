@@ -59,7 +59,7 @@ def initial_iwc(
     """
     q_sat = thermo.q_sat_ice(air_temperature, air_pressure)
     q_exhaust_ = q_exhaust(air_temperature, air_pressure, fuel_dist, width, depth, ei_h2o)
-    print("Emitted Ice Water Content: ", q_exhaust_)
+    print("Emitted Ice Water Content: ", q_exhaust_[0])
     return np.maximum(q_exhaust_ + specific_humidity - q_sat, 0.0)
 
 

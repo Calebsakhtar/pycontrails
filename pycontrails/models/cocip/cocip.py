@@ -890,7 +890,7 @@ class Cocip(Model):
         )
 
         if self.params["circulation"] and self.params["unterstrasser_ice_survival_fraction"]:
-            dz_max = self._sac_flight["dz_max"] = unterstrasser_wake_vortex.z_desc_length_scale(
+            dz_max = unterstrasser_wake_vortex.z_desc_length_scale(
                 wingspan=wingspan,
                 air_temperature=air_temperature,
                 air_pressure=air_pressure,
@@ -899,6 +899,7 @@ class Cocip(Model):
                 dT_dz=dT_dz,
                 circulation=self.params["circulation"],
             )
+            self._sac_flight.update(dz_max=dz_max)
 
         # derive downwash values and save to data model
         self._sac_flight["width"] = wake_vortex.initial_contrail_width(wingspan, dz_max)
@@ -909,11 +910,15 @@ class Cocip(Model):
 
         # HIJACK WIDTH AND DEPTH HERE
         if self.params["width_postvortex"]:
-            self._sac_flight["width"] = self.params["width_postvortex"]
-            print(f"Post-vortex contrail width hijacked to {self._sac_flight['width']} m")
+            self._sac_flight.update(
+                width=self.params["width_postvortex"] * np.ones_like(self._sac_flight["width"])
+            )
+            print(f"Post-vortex contrail width hijacked to {self._sac_flight['width'][0]} m")
         if self.params["depth_postvortex"]:
-            self._sac_flight["depth"] = self.params["depth_postvortex"]
-            print(f"Post-vortex contrail depth hijacked to {self._sac_flight['depth']} m")
+            self._sac_flight.update(
+                depth=self.params["depth_postvortex"] * np.ones_like(self._sac_flight["depth"])
+            )
+            print(f"Post-vortex contrail depth hijacked to {self._sac_flight['depth'][0]} m")
 
         # Initially, sigma_yz is set to 0
         # See bottom left paragraph p. 552 Schumann 2012 beginning with:
@@ -938,7 +943,6 @@ class Cocip(Model):
         met : MetDataset
             Meteorology data
         """
-
         # met parameters along Flight path
         air_pressure = self._sac_flight.air_pressure
         air_temperature = self._sac_flight["air_temperature"]
@@ -958,10 +962,14 @@ class Cocip(Model):
         depth = self._sac_flight["depth"]
 
         # initial contrail altitude set to 0.5 * depth
-        if self.params["contrail_postvortex_altitude"]:
+        if self.params["contrail_initzcoord"]:
             # HIJACK CONTRAIL POSTVORTEX ALTITUDE HERE
-            altitude = self.params["contrail_postvortex_altitude"]
-            print(f"Post-vortex contrail altitude hijacked to {altitude} m")
+            altitude = self._sac_flight.altitude + self.params[
+                "contrail_initzcoord"
+            ] * np.ones_like(depth)
+            print(
+                f"Post-vortex contrail altitude hijacked to {altitude[0]} m ({self.params['contrail_initzcoord']} m above cruise)"
+            )
         else:
             altitude = self._sac_flight.altitude - 0.5 * depth
 
@@ -1003,15 +1011,16 @@ class Cocip(Model):
         iwc = contrail_properties.initial_iwc(
             air_temperature, specific_humidity, air_pressure, fuel_dist, width, depth, ei_h2o
         )
-        print("Air temperature: ", air_temperature, " K")
-        print("Specific humidity: ", specific_humidity, " kg_water/kg_air")
-        print("Air pressure: ", air_pressure, " Pa")
-        print("Fuel flow: ", fuel_flow, " kg/s")
-        print("Fuel dist: ", fuel_dist, " kg/m")
-        print("Width: ", width, " m")
-        print("Depth: ", depth, " m")
+
+        print("Air temperature: ", air_temperature[0], " K")
+        print("Specific humidity: ", specific_humidity[0], " kg_water/kg_air")
+        print("Air pressure: ", air_pressure[0], " Pa")
+        print("Fuel flow: ", fuel_flow[0], " kg/s")
+        print("Fuel dist: ", fuel_dist[0], " kg/m")
+        print("Width: ", width[0], " m")
+        print("Depth: ", depth[0], " m")
         print("Ice emission index: ", ei_h2o, " kg_ice/kg_fuel")
-        print("Initial IWC: ", iwc, " kg_ice/kg_air")
+        print("Initial IWC: ", iwc[0], " kg_ice/kg_air")
 
         # Optional hijacking of ice mass emitted from the aircraft
         if self.params["I_formation"]:
@@ -1026,13 +1035,17 @@ class Cocip(Model):
         if self.params["I_postvortex"]:
             # HIJACK I HERE
             rho_air_formation = thermo.rho_d(air_temperature, air_pressure)
-            iwc_1 = self.params["I_postvortex"] / (width * depth * rho_air_formation)
+            iwc_1 = (
+                self.params["I_postvortex"]
+                / (width * depth * rho_air_formation)
+                * np.ones_like(iwc_1)
+            )
             print(f"Post-vortex I to {self.params['I_postvortex']} kg/m")
 
         if self.params["unterstrasser_ice_survival_fraction"]:
             wingspan = self._sac_flight.get_data_or_attr("wingspan")
             rhi_0 = thermo.rhi(specific_humidity, air_temperature, air_pressure)
-            print("RHI before wake vortex: ", rhi_0 * 100, " %")
+            print("RHI before wake vortex: ", rhi_0[0] * 100, " %")
             f_surv = unterstrasser_wake_vortex.ice_particle_number_survival_fraction(
                 air_temperature,
                 rhi_0,
@@ -1043,7 +1056,7 @@ class Cocip(Model):
                 nvpm_ei_n,
                 self._sac_flight["dz_max"],
             )
-            print("Initial ice particle survival fraction: ", f_surv)
+            print("Initial ice particle survival fraction: ", f_surv[0])
         else:
             f_surv = contrail_properties.ice_particle_survival_fraction(iwc, iwc_1)
 
@@ -1058,7 +1071,7 @@ class Cocip(Model):
             T_crit_sac=T_critical_sac,
             min_ice_particle_number_nvpm_ei_n=self.params["min_ice_particle_number_nvpm_ei_n"],
         )
-        print("Initial ice number count: ", n_ice_per_m_0, " m^-1")
+        print("Initial ice number count: ", n_ice_per_m_0[0], " m^-1")
 
         # Optional hijacking of the initial ice particle number
         if self.params["N_formation"]:
@@ -1068,8 +1081,8 @@ class Cocip(Model):
 
         if self.params["N_postvortex"]:
             # HIJACK N HERE
-            n_ice_per_m_1 = self.params["N_postvortex"]
-            print(f"Post-vortex N to {n_ice_per_m_1} m^-1")
+            n_ice_per_m_1 = self.params["N_postvortex"] * np.ones_like(n_ice_per_m_1)
+            print(f"Post-vortex N to {n_ice_per_m_1[0]} m^-1")
 
         # Check for persistent initial_contrails
         persistent_1 = contrail_properties.initial_persistent(iwc_1, rhi_1)
