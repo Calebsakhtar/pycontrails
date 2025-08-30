@@ -1024,8 +1024,8 @@ class Cocip(Model):
 
         # Optional hijacking of ice mass emitted from the aircraft
         if self.params["I_formation"]:
-            rho_air_formation = thermo.rho_d(air_temperature, air_pressure)
-            iwc = self.params["I_formation"] / (width * depth * rho_air_formation)
+            A_1 = np.pi * width * depth / 4
+            iwc = self.params["I_formation"] / (A_1 * rho_air_1)
 
         iwc_ad = contrail_properties.iwc_adiabatic_heating(
             air_temperature, air_pressure, air_pressure_1
@@ -1034,13 +1034,14 @@ class Cocip(Model):
 
         if self.params["I_postvortex"]:
             # HIJACK I HERE
-            rho_air_formation = thermo.rho_d(air_temperature, air_pressure)
+            A_1 = np.pi * width * depth / 4
             iwc_1 = (
                 self.params["I_postvortex"]
-                / (width * depth * rho_air_formation)
+                / (A_1 * rho_air_1)
                 * np.ones_like(iwc_1)
             )
             print(f"Post-vortex I to {self.params['I_postvortex']} kg/m")
+            print(f"Post-vortex IWC to {iwc_1[0]} kg/kg")
 
         if self.params["unterstrasser_ice_survival_fraction"]:
             wingspan = self._sac_flight.get_data_or_attr("wingspan")
