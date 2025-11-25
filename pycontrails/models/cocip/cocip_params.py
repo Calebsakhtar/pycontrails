@@ -280,11 +280,11 @@ class CocipParams(AdvectionBuffers):
 
     #: Minimum altitude domain in simulation, [:math:`m`]
     #: If set to ``None``, this check is disabled.
-    min_altitude_m: float | None = 9000.0
+    min_altitude_m: float | None = None
 
     #: Maximum altitude domain in simulation, [:math:`m`]
     #: If set to ``None``, this check is disabled.
-    max_altitude_m: float | None = 11500.0
+    max_altitude_m: float | None = None
 
     #: Maximum contrail segment length in simulation to prevent unrealistic values, [:math:`m`].
     max_seg_length_m: float = 40000.0
