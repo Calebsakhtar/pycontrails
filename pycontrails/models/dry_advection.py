@@ -35,11 +35,11 @@ class DryAdvectionParams(models.AdvectionBuffers):
 
     #: Apply Euler's method with a fixed step size of ``dt_integration``. Advected waypoints
     #: are interpolated against met data once each ``dt_integration``.
-    dt_integration: np.timedelta64 = np.timedelta64(30, "m")
+    dt_integration: np.timedelta64 = np.timedelta64(5, "m")
 
     #: Max age of plume evolution. If set to ``None``, ``timesteps`` must not be None
     #: and advection will continue until the final timestep for all plumes.
-    max_age: np.timedelta64 | None = np.timedelta64(20, "h")
+    max_age: np.timedelta64 | None = np.timedelta64(8, "h")
 
     #: Advection timesteps. If provided, ``dt_integration`` will be ignored.
     #:
@@ -55,7 +55,7 @@ class DryAdvectionParams(models.AdvectionBuffers):
     dz_m: float = 200.0
 
     #: Upper bound for evolved plume depth, constraining it to realistic values.
-    max_depth: float | None = 1500.0
+    max_depth: float | None = np.inf
 
     #: Initial plume width, [:math:`m`]. Overridden by "width" key on :attr:`source`.
     # If None, only pointwise advection is simulated without wind shear effects.

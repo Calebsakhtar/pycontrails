@@ -522,7 +522,12 @@ def T_potential(T: ArrayScalarLike, p: ArrayScalarLike) -> ArrayScalarLike:
     return T * (constants.p_surface / p) ** (constants.R_d / constants.c_pd)
 
 
-def brunt_vaisala_frequency(p: np.ndarray, T: np.ndarray, T_grad: np.ndarray) -> np.ndarray:
+def brunt_vaisala_frequency(
+    p: np.ndarray,
+    T: np.ndarray,
+    T_grad: np.ndarray,
+    N_BV: float | None = 0.01,
+) -> np.ndarray:
     r"""Calculate the Brunt-Vaisaila frequency.
 
     The Brunt-Vaisaila frequency is the frequency at which a vertically
@@ -548,4 +553,9 @@ def brunt_vaisala_frequency(p: np.ndarray, T: np.ndarray, T_grad: np.ndarray) ->
     """
     theta = T_potential(T, p)
     T_grad.clip(min=1e-6, out=T_grad)
+
+    if N_BV:
+        print("Using fixed Brunt-Vaisala frequency: ", N_BV)
+        return N_BV * np.ones_like(T_grad)
+
     return (T_grad * constants.g / theta) ** 0.5

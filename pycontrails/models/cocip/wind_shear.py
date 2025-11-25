@@ -42,8 +42,9 @@ def wind_shear_enhancement_factor(
     ----------
     - :cite:`schumannContrailCirrusPrediction2012`
     """
-    ratio = effective_vertical_resolution / contrail_depth
-    return 0.5 * (1.0 + ratio**wind_shear_enhancement_exponent)
+    # ratio = effective_vertical_resolution / contrail_depth
+    # return 0.5 * (1.0 + ratio**wind_shear_enhancement_exponent)
+    return 1.0
 
 
 def wind_shear_normal(
@@ -54,6 +55,7 @@ def wind_shear_normal(
     cos_a: ArrayScalarLike,
     sin_a: ArrayScalarLike,
     dz: float,
+    wind_shear: float | None = None,
 ) -> ArrayScalarLike:
     r"""Calculate the total wind shear normal to an axis.
 
@@ -81,6 +83,10 @@ def wind_shear_normal(
     ArrayScalarLike
        Wind shear normal to axis, [:math:`s^{-1}`]
     """
+    # If already provided, use the given wind shear value
+    if wind_shear:
+        return wind_shear * np.ones_like(u_wind_top)
+
     du_dz = (u_wind_top - u_wind_btm) / dz
     dv_dz = (v_wind_top - v_wind_btm) / dz
     return dv_dz * cos_a - du_dz * sin_a
@@ -92,6 +98,7 @@ def wind_shear(
     v_wind_top: ArrayScalarLike,
     v_wind_btm: ArrayScalarLike,
     dz: float,
+    wind_shear: float | None = None,
 ) -> ArrayScalarLike:
     r"""Calculate the total wind shear.
 
@@ -115,6 +122,10 @@ def wind_shear(
     ArrayScalarLike
        Total wind shear, [:math:`s^{-1}`]
     """
+    # If already provided, use the given wind shear value
+    if wind_shear:
+        return np.abs(wind_shear) * np.ones_like(u_wind_top)
+
     du_dz = (u_wind_top - u_wind_btm) / dz
     dv_dz = (v_wind_top - v_wind_btm) / dz
     return (du_dz**2 + dv_dz**2) ** 0.5

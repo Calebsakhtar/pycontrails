@@ -54,6 +54,20 @@ class CocipParams(AdvectionBuffers):
     """Model parameters required by the CoCiP models."""
 
     # -------------------------
+    # Parameters for the EULAG-LCM/APCEMM comparison
+    # -------------------------
+    normal_shear: float | None = None  # [1/s]
+    N_formation: float | None = None  # [#/m]
+    I_formation: float | None = None  # [kg/m]
+    circulation: float | None = None  # [m^2/s]
+    f_surv: float | None = None  # [1]
+    width_postvortex: float | None = None  # [m]
+    depth_postvortex: float | None = None  # [m]
+    contrail_initzcoord: float | None = None  # [m]
+    I_postvortex: float | None = None  # [kg/m]
+    N_postvortex: float | None = None  # [#/m]
+
+    # -------------------------
     # Implementation parameters
     # -------------------------
 
@@ -63,7 +77,7 @@ class CocipParams(AdvectionBuffers):
 
     #: Apply Euler's method with a fixed step size of ``dt_integration``. Advected waypoints
     #: are interpolated against met data once each ``dt_integration``.
-    dt_integration: np.timedelta64 = np.timedelta64(30, "m")
+    dt_integration: np.timedelta64 = np.timedelta64(5, "m")
 
     #: Difference in altitude between top and bottom layer for stratification calculations,
     #: [:math:`m`]. Used to approximate derivative of "lagrangian_tendency_of_air_pressure" layer.
@@ -202,7 +216,7 @@ class CocipParams(AdvectionBuffers):
     #: CoCiP only uses the ambient conditions at the mid-point of the Gaussian plume,
     #: and the edges could be in subsaturated conditions and sublimate. Important when
     #: :attr:`radiative_heating_effects` is enabled.
-    max_depth: float = 1500.0
+    max_depth: float = np.inf
 
     #: Experimental. Improved ice crystal number survival fraction in the wake vortex phase.
     #: Implement :cite:`lottermoserHighResolutionEarlyContrails2025`, who developed a
@@ -212,7 +226,7 @@ class CocipParams(AdvectionBuffers):
     #:
     #:  .. versionadded:: 0.50.1
     #:  .. versionchanged:: 0.54.7
-    unterstrasser_ice_survival_fraction: bool = False
+    unterstrasser_ice_survival_fraction: bool = True
 
     #: Experimental. Radiative heating effects on contrail cirrus properties.
     #: Terrestrial and solar radiances warm the contrail ice particles and cause
@@ -272,17 +286,17 @@ class CocipParams(AdvectionBuffers):
 
     #: Minimum altitude domain in simulation, [:math:`m`]
     #: If set to ``None``, this check is disabled.
-    min_altitude_m: float | None = 6000.0
+    min_altitude_m: float | None = None
 
     #: Maximum altitude domain in simulation, [:math:`m`]
     #: If set to ``None``, this check is disabled.
-    max_altitude_m: float | None = 13000.0
+    max_altitude_m: float | None = None
 
     #: Maximum contrail segment length in simulation to prevent unrealistic values, [:math:`m`].
     max_seg_length_m: float = 40000.0
 
     #: Max age of contrail evolution.
-    max_age: np.timedelta64 = np.timedelta64(20, "h")
+    max_age: np.timedelta64 = np.timedelta64(8, "h")
 
     #: Minimum contrail optical depth.
     min_tau: float = 1e-6

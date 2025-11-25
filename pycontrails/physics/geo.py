@@ -775,6 +775,7 @@ def advect_longitude(
     distance_m = u_wind * dt_s
 
     new_longitude = longitude + units.m_to_longitude_distance(distance_m, latitude)
+    new_longitude = longitude
     return (new_longitude + 180.0) % 360.0 - 180.0  # wrap antimeridian
 
 
@@ -816,7 +817,8 @@ def advect_latitude(
 
     distance_m = v_wind * dt_s
 
-    return latitude + units.m_to_latitude_distance(distance_m)
+    # return latitude + units.m_to_latitude_distance(distance_m)
+    return latitude
 
 
 def advect_level(
@@ -938,6 +940,10 @@ def advect_longitude_and_latitude_near_poles(
     )
     # new_longitude = 90.0 + units.radians_to_degrees(new_lon_rad) * hemisphere_sign
     new_longitude = (new_longitude + 180.0) % 360.0 - 180.0  # wrap antimeridian
+
+    new_longitude = longitude
+    new_latitude = latitude
+
     return new_longitude, new_latitude
 
 
