@@ -596,7 +596,7 @@ def brunt_vaisala_frequency(
     T_grad.clip(min=1e-6, out=T_grad)
 
     if N_BV:
-        print("Using fixed Brunt-Vaisala frequency: ", N_BV)
+        # print("Using fixed Brunt-Vaisala frequency: ", N_BV)
         return N_BV * np.ones_like(T_grad)
 
     return (T_grad * constants.g / theta) ** 0.5
