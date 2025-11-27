@@ -283,7 +283,7 @@ class CocipParams(AdvectionBuffers):
     #: Experimental: use revised contrail ice budget (to be described in a forthcoming paper).
     #: The revised ice budget includes tendencies associated with sedimentation across an
     #: ambient humidity gradient.
-    revised_contrail_ice_budget: bool = False
+    revised_contrail_ice_budget: bool = True
 
     # ---------------------------------------
     # Conditions for end of contrail lifetime
